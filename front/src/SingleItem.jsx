@@ -1,30 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
-import customFetch from "./utils";
+import { useChangeTask, useDeleteTask } from "./customHooks";
 const SingleItem = ({ item }) => {
-  const queryClient = useQueryClient();
-  const { mutate: changeTask } = useMutation({
-    mutationKey: ["tasks"],
-    mutationFn: (id) => customFetch.patch(`/${id}`, { isDone: !item.isDone }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Task was changed");
-    },
-    onError: () => {
-      toast.error("Error while changing");
-    },
-  });
-  const { mutate: deleteTask } = useMutation({
-    mutationKey: ["tasks"],
-    mutationFn: (id) => customFetch.delete(`/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Task was deleted");
-    },
-    onError: () => {
-      toast.error("Error while deleting");
-    },
-  });
+  const { changeTask } = useChangeTask();
+  const { deleteTask } = useDeleteTask();
 
   return (
     <div className="single-item">
@@ -32,7 +9,7 @@ const SingleItem = ({ item }) => {
         type="checkbox"
         checked={item.isDone}
         onChange={() => {
-          changeTask(item.id);
+          changeTask({ id: item.id, taskStatus: item.isDone });
         }}
       />
       <p
